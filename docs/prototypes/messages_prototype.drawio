@@ -1,0 +1,60 @@
+<mxfile host="app.diagrams.net" modified="2026-01-01T00:00:00.000Z" agent="draw.io" version="21.0.0" type="device">
+  <diagram name="Информационные окна" id="messages">
+    <mxGraphModel dx="900" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="800" pageHeight="400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Окно ошибки авторизации -->
+        <mxCell id="error_window" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E53935;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="320" height="150" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="error_header" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E53935;strokeColor=#C62828;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="320" height="35" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="error_icon" value="✕" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontColor=#FFFFFF;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="40" width="30" height="35" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="error_title" value="Ошибка авторизации" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="80" y="40" width="200" height="35" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="error_msg" value="Вы ввели неверный логин или пароль.&#xa;Пожалуйста проверьте ещё раз&#xa;введенные данные." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="280" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="error_btn" value="OK" style="rounded=3;whiteSpace=wrap;html=1;fillColor=#E53935;strokeColor=#C62828;fontColor=#FFFFFF;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="170" y="145" width="60" height="28" as="geometry" />
+        </mxCell>
+        
+        <!-- Окно успешной смены пароля -->
+        <mxCell id="success_window" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4CAF50;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="420" y="40" width="320" height="150" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="success_header" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#388E3C;" vertex="1" parent="1">
+          <mxGeometry x="420" y="40" width="320" height="35" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="success_icon" value="✓" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontColor=#FFFFFF;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="430" y="40" width="30" height="35" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="success_title" value="Успешно" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="460" y="40" width="200" height="35" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="success_msg" value="Пароль успешно изменён!&#xa;Теперь вы можете войти в систему&#xa;с новым паролем." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="440" y="90" width="280" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="success_btn" value="OK" style="rounded=3;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#388E3C;fontColor=#FFFFFF;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="145" width="60" height="28" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
