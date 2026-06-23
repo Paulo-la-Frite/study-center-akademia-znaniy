@@ -11,7 +11,7 @@ class LoginWindow:
     def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title(f"{APP_NAME} — Авторизация")
-        self.root.geometry("400x320")
+        self.root.geometry("400x370")
         self.root.resizable(False, False)
         self.root.configure(bg="#f5f5f5")
         
@@ -22,79 +22,78 @@ class LoginWindow:
         y = (self.root.winfo_screenheight() // 2) - (h // 2)
         self.root.geometry(f"{w}x{h}+{x}+{y}")
         
+        self.captcha_passed = False
         self.captcha_fails = 0
-        self.current_login = ""
-        self.current_password = ""
         
         self.build_ui()
     
     def build_ui(self):
         """Построение интерфейса."""
         main_frame = tk.Frame(self.root, bg="#ffffff", highlightbackground="#cccccc", highlightthickness=1)
-        main_frame.place(relx=0.5, rely=0.5, anchor="center", width=340, height=260)
+        main_frame.place(relx=0.5, rely=0.5, anchor="center", width=340, height=320)
         
         tk.Label(main_frame, text=APP_NAME, font=("Arial", 16, "bold"),
                  bg="#ffffff", fg="#2196F3").pack(pady=(15, 0))
         tk.Label(main_frame, text="Вход в систему", font=("Arial", 10),
                  bg="#ffffff", fg="#666666").pack(pady=(0, 15))
         
+        # Логин
         tk.Label(main_frame, text="Логин:", font=("Arial", 10),
                  bg="#ffffff", fg="#333333").pack(anchor="w", padx=30)
         self.login_var = tk.StringVar()
         self.login_entry = tk.Entry(main_frame, textvariable=self.login_var, width=35,
-                                     font=("Arial", 10), relief="solid", bd=1)
+                                     font=("Arial", 10), relief="solid", bd=1,
+                                     state="disabled", disabledbackground="#f0f0f0")
         self.login_entry.pack(padx=30, pady=(2, 8))
-        self.login_entry.focus()
         
+        # Пароль
         tk.Label(main_frame, text="Пароль:", font=("Arial", 10),
                  bg="#ffffff", fg="#333333").pack(anchor="w", padx=30)
         self.password_var = tk.StringVar()
         self.password_entry = tk.Entry(main_frame, textvariable=self.password_var, width=35,
-                                        font=("Arial", 10), relief="solid", bd=1, show="•")
-        self.password_entry.pack(padx=30, pady=(2, 15))
+                                        font=("Arial", 10), relief="solid", bd=1, show="•",
+                                        state="disabled", disabledbackground="#f0f0f0")
+        self.password_entry.pack(padx=30, pady=(2, 10))
         
+        # Капча
+        captcha_frame = tk.Frame(main_frame, bg="#ffffff")
+        captcha_frame.pack(pady=5)
+        
+        self.captcha_var = tk.BooleanVar(value=False)
+        self.captcha_check = tk.Checkbutton(captcha_frame, text="Я не робот",
+                                             variable=self.captcha_var,
+                                             state="disabled", bg="#ffffff",
+                                             font=("Arial", 10))
+        self.captcha_check.pack(side="left")
+        
+        self.captcha_btn = tk.Button(captcha_frame, text="Пройти проверку",
+                                      command=self.show_captcha,
+                                      bg="#FF9800", fg="#ffffff", font=("Arial", 9),
+                                      relief="flat", cursor="hand2", padx=10)
+        self.captcha_btn.pack(side="left", padx=10)
+        
+        # Кнопка Войти
         self.login_button = tk.Button(main_frame, text="Войти", command=self.do_login,
                                        bg="#2196F3", fg="#ffffff", font=("Arial", 11, "bold"),
-                                       relief="flat", cursor="hand2", width=20, height=1)
-        self.login_button.pack(pady=(0, 5))
+                                       relief="flat", cursor="hand2", width=20, height=1,
+                                       state="disabled")
+        self.login_button.pack(pady=(10, 5))
         
         self.root.bind("<Return>", lambda event: self.do_login())
-        self.login_entry.bind("<Tab>", lambda e: self.password_entry.focus())
-        self.password_entry.bind("<Tab>", lambda e: self.login_button.focus())
-    
-    def do_login(self):
-        """Обработчик входа."""
-        login = self.login_var.get().strip()
-        password = self.password_var.get()
-        
-        if not login or not password:
-            messagebox.showwarning("Предупреждение", "Пожалуйста, заполните все поля.\nЛогин и пароль обязательны.")
-            return
-        
-        self.current_login = login
-        self.current_password = password
-        self.captcha_fails = 0
-        
-        # Проверяем, не заблокирован ли уже пользователь
-        user_check = authenticate(login, password)
-        if user_check and user_check.get('blocked'):
-            messagebox.showerror("Доступ заблокирован", "Вы заблокированы. Обратитесь к администратору.")
-            return
-        
-        # Показываем капчу
-        self.show_captcha()
     
     def show_captcha(self):
         """Открывает окно капчи."""
-        
         self.root.withdraw()
         captcha_window = tk.Toplevel(self.root)
-        captcha_solved = [False]  # список для передачи по ссылке
+        captcha_solved = [False]
+        attempts_exceeded = [False]
         
         from src.ui.captcha_window import CaptchaWindow
         
         def on_fail():
             self.captcha_fails += 1
+            if self.captcha_fails >= MAX_FAILED_ATTEMPTS:
+                attempts_exceeded[0] = True
         
         def on_success():
             captcha_solved[0] = True
@@ -102,30 +101,47 @@ class LoginWindow:
         CaptchaWindow(captcha_window, self.root, on_fail, on_success)
         self.root.wait_window(captcha_window)
         
+        if attempts_exceeded[0]:
+            self.captcha_btn.config(text="Заблокировано", bg="#E53935", state="disabled")
+            self.root.deiconify()
+            messagebox.showerror("Доступ заблокирован", 
+                                "Слишком много попыток. Попробуйте позже.")
+            return
+        
         if captcha_solved[0]:
-            self._do_authenticate()
+            self.captcha_passed = True
+            self.captcha_var.set(True)
+            self.login_entry.config(state="normal")
+            self.password_entry.config(state="normal")
+            self.login_button.config(state="normal", bg="#4CAF50")
+            self.captcha_btn.config(text="Пройдено ✓", bg="#4CAF50", state="disabled")
+            self.login_entry.focus()
         else:
-            if self.captcha_fails >= MAX_FAILED_ATTEMPTS:
-                self._block_and_return()
-            else:
-                self.root.deiconify()
+            self.captcha_var.set(False)
+        
+        self.root.deiconify()
     
-    def _do_authenticate(self):
-        """Выполняет аутентификацию после успешной капчи."""
-        user = authenticate(self.current_login, self.current_password)
+    def do_login(self):
+        """Обработчик входа."""
+        if not self.captcha_passed:
+            messagebox.showwarning("Проверка", "Сначала пройдите проверку «Я не робот».")
+            return
+        
+        login = self.login_var.get().strip()
+        password = self.password_var.get()
+        
+        if not login or not password:
+            messagebox.showwarning("Предупреждение", "Пожалуйста, заполните все поля.")
+            return
+        
+        user = authenticate(login, password)
         
         if user is None:
-            messagebox.showerror(
-                "Ошибка авторизации",
-                "Вы ввели неверный логин или пароль.\nПожалуйста проверьте ещё раз введенные данные."
-            )
-            self.root.deiconify()
+            messagebox.showerror("Ошибка авторизации",
+                                "Вы ввели неверный логин или пароль.\nПожалуйста проверьте ещё раз введенные данные.")
         elif user.get('blocked'):
-            messagebox.showerror(
-                "Доступ заблокирован",
-                "Вы заблокированы. Обратитесь к администратору."
-            )
-            self.root.deiconify()
+            messagebox.showerror("Доступ заблокирован", 
+                                "Вы заблокированы. Обратитесь к администратору.")
         else:
             messagebox.showinfo("Успех", "Вы успешно авторизовались.")
             if user['password_must_change']:
@@ -135,14 +151,6 @@ class LoginWindow:
                 ChangePasswordWindow(change_window, user['user_id'], self.root)
             else:
                 self.open_dashboard(user)
-    
-    def _block_and_return(self):
-        """Блокирует попытки и возвращает на экран входа."""
-        messagebox.showerror(
-            "Доступ заблокирован",
-            "Вы заблокированы. Обратитесь к администратору."
-        )
-        self.root.deiconify()
     
     def open_dashboard(self, user: dict):
         """Открывает интерфейс в зависимости от роли."""

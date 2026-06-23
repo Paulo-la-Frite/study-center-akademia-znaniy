@@ -15,7 +15,7 @@ class CaptchaWindow:
         self.success_callback = success_callback
         self.pieces = []
         self.slots = {}
-        self.piece_size = 117  # финальный размер фрагмента
+        self.piece_size = 117
         
         window.title("Проверка безопасности — соберите пазл")
         window.geometry("668x668")
@@ -34,10 +34,19 @@ class CaptchaWindow:
         self.login_window.deiconify()
     
     def build_ui(self):
+        # Очищаем старые виджеты
+        for widget in self.window.winfo_children():
+            widget.destroy()
+        
+        self.pieces = []
+        self.slots = {}
+        self.selected_piece = None
+        self.selected_label = None
+        
         tk.Label(self.window, text="Соберите изображение — кликните на фрагмент, затем на ячейку",
                  font=("Arial", 11, "bold"), bg="#f5f5f5").pack(pady=15)
         
-        # Загружаем и уменьшаем до 117x117 (702 / 6 = 117)
+        # Загружаем фрагменты
         self.piece_images = {}
         for i in range(1, 5):
             path = os.path.join(self.pieces_dir, f"{i}.png")
@@ -45,11 +54,10 @@ class CaptchaWindow:
             img = img.subsample(6, 6)
             self.piece_images[i] = img
         
-        # Основной контейнер
+        # Сетка сборки 2x2
         main = tk.Frame(self.window, bg="#f5f5f5")
         main.pack(expand=True)
         
-        # Сетка сборки 2x2
         grid_frame = tk.Frame(main, bg="#666666", bd=1)
         grid_frame.pack()
         
@@ -73,7 +81,7 @@ class CaptchaWindow:
         # Разделитель
         tk.Frame(self.window, bg="#cccccc", height=1).pack(fill="x", padx=50, pady=15)
         
-        # Фрагменты (перемешаны) в один ряд
+        # Фрагменты
         tk.Label(self.window, text="Фрагменты:", font=("Arial", 10, "bold"),
                  bg="#f5f5f5").pack()
         
@@ -128,9 +136,9 @@ class CaptchaWindow:
             self.selected_label.config(relief="raised", bd=2, bg="#ffffff")
         self.selected_label = None
         
-        # Автопроверка — все ячейки заполнены?
+        # Автопроверка
         if all(self.slots[pos]["piece"] is not None for pos in self.slots):
-            self.check_puzzle()
+            self.window.after(300, self.check_puzzle)
     
     def check_puzzle(self):
         correct = {(0, 0): 1, (0, 1): 2, (1, 0): 3, (1, 1): 4}
@@ -142,3 +150,4 @@ class CaptchaWindow:
         else:
             messagebox.showerror("Ошибка", "Пазл собран неверно.\nПопробуйте ещё раз.")
             self.fail_callback()
+            self.window.destroy()
